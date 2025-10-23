@@ -1,0 +1,18 @@
+services:
+  dayz-server:
+    image: battlecorax/dayz-server:latest
+    cap_add:
+      - SYS_NICE
+    restart: unless-stopped
+    ports:
+      - 2302-2305:2302-2305/udp
+      - 8766:8766/udp
+      - 27016:27016/udp
+    volumes:
+      - ./data:/dayz-server
+    env_file:
+      - .env
+    environment:
+      - STEAM_USERNAME=
+      - STEAM_PASSWORD=
+      - STEAM_GUARD=
