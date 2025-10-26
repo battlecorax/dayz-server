@@ -1,53 +1,41 @@
 #!/bin/bash
 set -e
 
-dayz_mods_array=${DAYZ_MODS//;/ }
-dayz_server_mods_array=${DAYZ_SERVER_MODS//;/ }
-
-# Looping through selected mods and server mods to create the proper launch parameters
-steam_mods_string=""
-for mod in ${dayz_mods_array}; do
-    steam_mods_string+=" +workshop_download_item 221100 ${mod}"
-done
-for mod in ${dayz_server_mods_array}; do
-    steam_mods_string+=" +workshop_download_item 221100 ${mod}"
-done
-
-# DayZ server installation and update via steamcmd
-/usr/games/steamcmd +force_install_dir ${SERVER_DIR} \
-    +login ${STEAM_USERNAME} ${STEAM_PASSWORD} ${STEAM_GUARD} \
-    +app_update 223350 \
-    ${steam_mods_string} \
-    +quit
-
-# Mpmissions might be missing at server download, if so, we will download it from GitHub
-if [ ! -d "${SERVER_DIR}/mpmissions" ]; then
-    mkdir "/download"
-    cd /download
-    curl -s https://api.github.com/repos/BohemiaInteractive/DayZ-Central-Economy/releases/latest \
-    | grep "tarball_url" \
-    | cut -d : -f 2,3 \
-    | tr -d \", \
-    | wget -qi -
-
-    tar -xzvf DZ_* --strip=1
-
-    mkdir -p ${SERVER_DIR}/mpmissions
-    cp -r dayzOffline.* ${SERVER_DIR}/mpmissions/
-
-    cd ${SERVER_DIR}
-    rm -rf /download
+# Copy the selected mission from mpmissions-available to mpmissions if it doesn't already exist
+if [ ! -d "/server/mpmissions/${DAYZ_MISSION}" ]; then
+    if [ -d "/server/missions-available/${DAYZ_MISSION}" ]; then
+        cp -r "/server/missions-available/${DAYZ_MISSION}" "/server/mpmissions/${DAYZ_MISSION}"
+    else
+        echo "Warning: Specified mission ${DAYZ_MISSION} not found in mpmissions-available. The mpmissions folder will remain empty."
+    fi
 fi
 
-# Linking mods into the server directory, and copies over the keys if provided
-for mod in ${dayz_mods_array} ${dayz_server_mods_array}
-do
-    if [ ! -d "${SERVER_DIR}/${mod}" ]; then
-        ln -s ${SERVER_DIR}/steamapps/workshop/content/221100/${mod} ${SERVER_DIR}/${mod}
-        
-        if [ -d ${SERVER_DIR}/${mod}/keys ]; then cp -r ${SERVER_DIR}/${mod}/keys/*.bikey ${SERVER_DIR}/keys; fi
-        if [ -d ${SERVER_DIR}/${mod}/Keys ]; then cp -r ${SERVER_DIR}/${mod}/Keys/*.bikey ${SERVER_DIR}/keys; fi
-    fi
-done
+# Generates the config file from environment variables
+echo "" > serverDZ.cfg
+echo "hostname = \"${DAYZ_HOSTNAME}\";" >> serverDZ.cfg
+echo "password = \"${DAYZ_PASSWORD}\";" >> serverDZ.cfg
+echo "passwordAdmin = \"${DAYZ_ADMIN_PASSWORD}\";" >> serverDZ.cfg
+echo "description = \"${DAYZ_DESCRIPTION}\";" >> serverDZ.cfg
+echo "enableWhitelist = ${DAYZ_ENABLE_WHITELIST};" >> serverDZ.cfg
+echo "maxPlayers = ${DAYZ_MAX_PLAYERS};" >> serverDZ.cfg
+echo "verifySignatures = 2;" >> serverDZ.cfg
+echo "forceSameBuild = ${DAYZ_FORCE_SAME_BUILD};" >> serverDZ.cfg
+echo "disableVoN = ${DAYZ_DISABLE_VON};" >> serverDZ.cfg
+echo "vonCodecQuality = ${DAYZ_VON_CODEC_QUALITY};" >> serverDZ.cfg
+echo "shardId = \"${DAYZ_SHARD_ID}\";" >> serverDZ.cfg
+echo "disable3rdPerson = ${DAYZ_DISABLE_3RD_PERSON};" >> serverDZ.cfg
+echo "disableCrosshair = ${DAYZ_DISABLE_CROSSHAIR};" >> serverDZ.cfg
+echo "disablePersonalLight = ${DAYZ_DISABLE_PERSONAL_LIGHT};" >> serverDZ.cfg
+echo "lightingConfig = ${DAYZ_LIGHTING_CONFIG};" >> serverDZ.cfg
+echo "serverTime = \"${DAYZ_SERVER_TIME}\";" >> serverDZ.cfg
+echo "serverTimeAcceleration = ${DAYZ_SERVER_TIME_ACCELERATION};" >> serverDZ.cfg
+echo "serverNightTimeAcceleration=${DAYZ_SERVER_NIGHT_TIME_ACCELERATION};" >> serverDZ.cfg
+echo "serverTimePersistent = ${DAYZ_SERVER_TIME_PERSISTENT};" >> serverDZ.cfg
+echo "guaranteedUpdates = 1;" >> serverDZ.cfg
+echo "loginQueueConcurrentPlayers = ${DAYZ_LOGIN_QUEUE_CONCURRENT_PLAYERS};" >> serverDZ.cfg
+echo "loginQueueMaxPlayers = ${DAYZ_LOGIN_QUEUE_MAX_PLAYERS};" >> serverDZ.cfg
+echo "instanceId = 1;" >> serverDZ.cfg
+echo "storageAutoFix = ${DAYZ_STORAGE_AUTO_FIX};" >> serverDZ.cfg
+echo "class Missions { class DayZ { template=\"${DAYZ_MISSION}\"}; };" >> serverDZ.cfg
 
 ./DayZServer -config=serverDZ.cfg -port=${SERVER_PORT} -mod=${DAYZ_MODS} -servermod=${DAYZ_SERVER_MODS} -BEpath=battleye -profiles=profiles -dologs -adminlog -netlog -freezecheck ${SERVER_ARGS}

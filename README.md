@@ -3,23 +3,42 @@
 This image lets you run your own DayZ server in a docker container.<br>
 It is easy to set up and configure.
 
-## Steam user
-It is sadly nessesary to provide both steam user and steam password to download the DayZ server.<br>
-This means that if your account is protected by by an authenticator, you will need to authenticate every time the server restarts!
-I have read, but not tested yet, that wyou can create a separate steam account and use that for your server.
-
 ## Environment Variables
 | Variable      | Default   | Required  | Description   |
 | ---------     | --------  | --------- | ---------     |
-| STEAM_USERNAME |           | Yes       | The steam user used for downloading and updating the server through SteamCmd. |
-| STEAM_PASSWORD |          | Yes       | The password for the steam user provided. |
-| STEAM_GUARD   |           | Optional  | The steam guard code, unless Steam Guard is disabled on your account, or you are using mobile authenticator. |
-| SERVER_DIR   | /dayz-server | Optional  | Defines the installation path of the dayz server |
-| SERVER_PORT | 2302        | Optional  | Sets the server port to be used for the game |
-| SERVER_ARGS   |           | Optional  | Any additional server arguments that should be passed to the server start command |
-| DAYZ_MODS   |           | Optional  | Adds mods to your server. Mod identifiers sparated by ";" Eg. 12345678;23456789; |
-| DAYZ_SERVER_MODS   |           | Optional  | Adds mods to your server. Like DAYZ_MODS, but used with server mod parameter. Mod identifiers sparated by ";" Eg. 12345678;23456789; |
+| SERVER_PORT   | 2302      | Optional  | Sets the server port to be used for the game |
+| DAYZ_HOSTNAME | My DayZ Server | Optional | |
+| DAYZ_PASSWORD |  | Optional | |
+| DAYZ_ADMIN_PASSWORD | admin123 | Optional | |
+| DAYZ_DESCRIPTION | Welcome to my DayZ server! | Optional | |
+| DAYZ_ENABLE_WHITELIST | 0 | Optional | |
+| DAYZ_MAX_PLAYERS | 60 | Optional | |
+| DAYZ_FORCE_SAME_BUILD | 1 | Optional | |
+| DAYZ_DISABLE_VON | 0 | Optional | |
+| DAYZ_VON_CODEC_QUALITY | 20 | Optional | |
+| DAYZ_SHARD_ID | 123abc | Optional | |
+| DAYZ_DISABLE_3RD_PERSON | 0 | Optional | |
+| DAYZ_DISABLE_CROSSHAIR | 0 | Optional | |
+| DAYZ_DISABLE_PERSONAL_LIGHT | 1 | Optional | |
+| DAYZ_LIGHTING_CONFIG | 1 | Optional | |
+| DAYZ_SERVER_TIME | SystemTime | Optional | |
+| DAYZ_SERVER_TIME_ACCELERATION | 12 | Optional | |
+| DAYZ_SERVER_NIGHT_TIME_ACCELERATION | 1 | Optional | |
+| DAYZ_SERVER_TIME_PERSISTENT | 1 | Optional | |
+| DAYZ_LOGIN_QUEUE_CONCURRENT_PLAYERS | 5 | Optional | |
+| DAYZ_LOGIN_QUEUE_MAX_PLAYERS | 500 | Optional | |
+| DAYZ_STORAGE_AUTO_FIX | 1 | Optional | |
+| DAYZ_MISSION  | dayzOffline.chernarusplus | Optional | Defines the map played on the server. If the selected mission is not one of the available missions (see "Server missions" section), the missions folder will stay empty. |
 
-## TODO
-- Add support for mods
-- Add support for server restarts and messages
+## Server missions
+Official regular server images are downloaded to the image and available for use.
+Notice, that if you change any files in the mission folder, they will not be copied over again, unless you delete the entire folder and restart the container.
+
+### Included maps
+| Mission name | Map |
+| ----------- | ----- |
+| dayzOffline.chernarusplus | Chernarus |
+| dayzOffline.sakhal | Frostline |
+| dayzOffline.enoch | Livonia |
+
+If you enter another name than any of these, the mpmissions folder will stay empty, and the server will fail to start unless you provide your own corresponding mission files. This is useful if you want to play a modded map.

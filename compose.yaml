@@ -9,10 +9,6 @@ services:
       - 8766:8766/udp
       - 27016:27016/udp
     volumes:
-      - ./data:/dayz-server
-    env_file:
-      - .env
-    environment:
-      - STEAM_USERNAME=
-      - STEAM_PASSWORD=
-      - STEAM_GUARD=
+      - ./data/mpmissions:/server/mpmissions
+      - ./data/profiles:/server/profiles
+      - ./data/mods:/server/user-mods

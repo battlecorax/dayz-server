@@ -3,5 +3,8 @@
 .gitignore
 compose.yaml
 Dockerfile
+entrypoint.sh.bak
 README.md
 data
+steam_pass.txt
+steam_user.txt
