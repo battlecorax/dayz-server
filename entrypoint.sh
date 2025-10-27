@@ -36,6 +36,17 @@ echo "loginQueueConcurrentPlayers = ${DAYZ_LOGIN_QUEUE_CONCURRENT_PLAYERS};" >> 
 echo "loginQueueMaxPlayers = ${DAYZ_LOGIN_QUEUE_MAX_PLAYERS};" >> serverDZ.cfg
 echo "instanceId = 1;" >> serverDZ.cfg
 echo "storageAutoFix = ${DAYZ_STORAGE_AUTO_FIX};" >> serverDZ.cfg
-echo "class Missions { class DayZ { template=\"${DAYZ_MISSION}\"}; };" >> serverDZ.cfg
+echo "class Missions { class DayZ { template=\"${DAYZ_MISSION}\"; }; };" >> serverDZ.cfg
+
+# Links the mods from user-mods
+for dir in /server/user-mods/*/
+do
+    dir=${dir%*/}
+    dir="${dir##*/}"
+
+    ln -s "/server/user-mods/${dir}" "/server/${dir}"
+    if [ -d "/server/${dir}/keys" ]; then cp -rf "/server/${dir}/keys/"* /server/keys/; fi
+    if [ -d "/server/${dir}/Keys" ]; then cp -rf "/server/${dir}/Keys/"* /server/keys/; fi
+done
 
 ./DayZServer -config=serverDZ.cfg -port=${SERVER_PORT} -mod=${DAYZ_MODS} -servermod=${DAYZ_SERVER_MODS} -BEpath=battleye -profiles=profiles -dologs -adminlog -netlog -freezecheck ${SERVER_ARGS}

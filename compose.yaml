@@ -12,3 +12,5 @@ services:
       - ./data/mpmissions:/server/mpmissions
       - ./data/profiles:/server/profiles
       - ./data/mods:/server/user-mods
+    env_file:
+      - .env
