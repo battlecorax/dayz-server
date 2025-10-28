@@ -44,7 +44,10 @@ do
     dir=${dir%*/}
     dir="${dir##*/}"
 
-    ln -s "/server/user-mods/${dir}" "/server/${dir}"
+    # Creates symlink if it doesn't already exist
+    if [ ! -e "/server/${dir}" ]; then ln -s "/server/user-mods/${dir}" "/server/${dir}"; fi
+    
+    # Copies keys
     if [ -d "/server/${dir}/keys" ]; then cp -rf "/server/${dir}/keys/"* /server/keys/; fi
     if [ -d "/server/${dir}/Keys" ]; then cp -rf "/server/${dir}/Keys/"* /server/keys/; fi
 done
